@@ -15,6 +15,22 @@ if (!userStore.userId) {
   router.push("/");
 }
 
+// Format AI messages for better display
+const formatMessage = (text: string) => {
+  if (!text) return "";
+
+  return text
+    .replace(/\n/g, "<br>")
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    .replace(/`(.*)`/g, "<code>$1</code>")
+    .replace(/(?:^|\n)- (.*?)(?:\n|$)/g, "<li>$1</li>")
+    .replace(/(?:^|\n)(\d+)\. (.*?)(?:\n|$)/g, "<li>$1. $2</li>")
+    .replace(/<\/li>\n<li>/g, "</li><li>")
+    .replace(/<li>/, "<ul><li>")
+    .replace(/<\/li>$/, "</li></ul>");
+};
+
 // Auto-scroll to bottom
 const scrollToBottom = () => {
   nextTick(() => {
@@ -42,15 +58,14 @@ onMounted(() => {
         :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
       >
         <div
+          v-html="formatMessage(msg.content)"
           class="max-w-xs px-4 py-2 rounded-lg md:max-w-md"
           :class="
             msg.role === 'user'
               ? 'bg-blue-600 text-white'
               : 'bg-gray-700 text-white'
           "
-        >
-          {{ msg.content }}
-        </div>
+        ></div>
       </div>
       <div v-if="chatStore.isLoading" class="flex-justify-start">
         <div class="bg-gray-700 text-white px-4 py-2 rounded-lg">
